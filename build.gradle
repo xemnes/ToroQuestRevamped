@@ -40,7 +40,8 @@ repositories {
 }
 
 dependencies {
-    deobfCompile "curse.maven:undergroundbiomes-293268:2925430"
+//    deobfCompile "curse.maven:undergroundbiomes-293268:2925430"
+    compile files("E:/.minecraft/realmofstorms/source files/UndergroundBiomesConstructs-6c67a8427326882952a1fd4d808e222b8ef993d4/build/libs/UndergroundBiomesConstructs-1.12-1.3.8.jar")
     deobfCompile "curse.maven:infinitylib-251396:3317119"
     deobfCompile "curse.maven:agricraft-225635:3317747"
     deobfCompile "curse.maven:dynamictrees-252818:3260881"
