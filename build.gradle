@@ -45,6 +45,8 @@ dependencies {
     deobfCompile "curse.maven:infinitylib-251396:3317119"
     deobfCompile "curse.maven:agricraft-225635:3317747"
     deobfCompile "curse.maven:dynamictrees-252818:3260881"
+
+    deobfCompile "curse.maven:biomesoplenty-220318:2842510"
 }
 
 processResources {
