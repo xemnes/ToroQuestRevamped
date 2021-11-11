@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
 import net.minecraft.block.BlockGrass;
@@ -985,7 +987,7 @@ public class QuestMine extends QuestBase implements Quest
 	// ========================================================================================
 	// ========================================================================================
 
-	// public static final List<ItemStack> blockStone = OreDictionary.getOres("stone");
+	 public static final List<ItemStack> cobbleStone = OreDictionary.getOres("cobblestone");
 	
 	// public static final List<ItemStack> blockStone = OreDictionary.getOres("stone");
 
@@ -1003,6 +1005,10 @@ public class QuestMine extends QuestBase implements Quest
 				Block b = Block.getBlockFromItem(item);
 				
 				if ( b instanceof BlockLog )
+				{
+					return true;
+				}
+				else if ( b instanceof BlockBranch || b instanceof BlockTrunkShell)
 				{
 					return true;
 				}
@@ -1026,35 +1032,35 @@ public class QuestMine extends QuestBase implements Quest
 			{
 				Block b = Block.getBlockFromItem(item);
 
-//				if ( ToroQuestConfiguration.useOreDicForMineQuest )
-//				{
-//					if ( b.getUnlocalizedName().equals("tile.stonebrick") )
-//					{
-//						return true;
-//					}
-//					
-//					if ( b.getUnlocalizedName().equals("tile.cobblestone") )
-//					{
-//						return true;
-//					}
-//					
-//					if ( b.getUnlocalizedName().equals("tile.stone") )
-//					{
-//						return true;
-//					}xx
-//					
-////					for ( ItemStack block : blockStone )
-////					{
-////						if ( block.getItem().getUnlocalizedName().equals(b.getUnlocalizedName()) )
-////						{
-////							return true;
-////						}
-////					}
-//				}
-				if ( b.getDefaultState().getMaterial() == Material.ROCK && b.getDefaultState().isFullCube() )
-				{
-					return true;
-				}
+
+					if ( b.getUnlocalizedName().equals("tile.stonebrick") )
+					{
+						return true;
+					}
+
+					if ( b.getUnlocalizedName().equals("tile.cobblestone") )
+					{
+						return true;
+					}
+
+					if ( b.getUnlocalizedName().equals("tile.stone") )
+					{
+						return true;
+					}
+
+					for ( ItemStack block : cobbleStone )
+					{
+						if ( b.getDefaultState().getMaterial() == Material.ROCK && b.getDefaultState().isFullCube() )
+						{
+							if ( block.getItem().getUnlocalizedName().equals(b.getUnlocalizedName()) )
+							{
+								return false;
+							}
+							else return true;
+						}
+					}
+
+
 				
 				return false;
 			}
@@ -1158,38 +1164,38 @@ public class QuestMine extends QuestBase implements Quest
 		{
 			case 0: // LOG
 			{
-				roll = (rand.nextInt(3)+2)*64;
-				em = (int)Math.round(roll/6)+4;
+				roll = (rand.nextInt(5)+2)*16;
+				em = (int)Math.round(roll/8)+3;
 				break;
 			}
 			case 1: // DIRT
 			{
-				roll = (rand.nextInt(3)+2)*64;
-				em = (int)Math.round(roll/16)+4;
+				roll = (rand.nextInt(4)+3)*4;
+				em = (int)Math.round(roll/16)+2;
 				break;
 			}
 			case 2: // STONE
 			{
-				roll = (rand.nextInt(3)+2)*64;
-				em = (int)Math.round(roll/16)+4;
+				roll = (rand.nextInt(4)+3)*16;
+				em = (int)Math.round(roll/16)+2;
 				break;
 			}
 			case 3: // COAL
 			{
-				roll = (rand.nextInt(3)+2)*8;
-				em = (int)Math.round(roll/2)+2;
+				roll = (rand.nextInt(3)+2)*4;
+				em = (int)Math.round(roll/4)+3;
 				break;
 			}
 			case 4: // REDSTONE
 			{
-				roll = (rand.nextInt(3)+2)*8;
-				em = (int)Math.round(roll/3)+6;
+				roll = (rand.nextInt(3)+2)*4;
+				em = (int)Math.round(roll/4)+3;
 				break;
 			}
 			case 5: // OBSIDIAN
 			{
-				roll = (rand.nextInt(4)+2)*8;
-				em = (int)Math.round(roll/2)+8;
+				roll = (rand.nextInt(4)+2)*4;
+				em = (int)Math.round(roll/2)+3;
 				break;
 			}
 			case 6: // GLOWSTONE
@@ -1206,7 +1212,7 @@ public class QuestMine extends QuestBase implements Quest
 			}
 			case 8: // DIAMOND
 			{
-				roll = 3;
+				roll = 2;
 				em = 30;
 				break;
 			}

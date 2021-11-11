@@ -14,6 +14,12 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import com.ferreusveritas.dynamictrees.ModConfigs;
+import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
+import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
 import com.google.common.base.Predicate;
 
 import net.minecraft.block.Block;
@@ -74,6 +80,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -1156,6 +1163,59 @@ public class CivilizationHandlers
 //			}
 //		}
 //	}
+
+	public int volume;
+
+
+	public int getDTVolume(BreakEvent event) {
+		EntityPlayer player = event.getPlayer();
+		if (player == null) { return 0; }
+
+		Block eventBlock = event.getState().getBlock();
+		boolean isShell = eventBlock instanceof BlockTrunkShell;
+
+		if (eventBlock instanceof BlockBranch || isShell) {
+			BlockPos pos = event.getPos();
+			World world = event.getWorld();
+			IBlockState state = world.getBlockState(pos);
+			if (isShell) {
+				BlockTrunkShell.ShellMuse muse = ((BlockTrunkShell)eventBlock).getMuse(world, pos);
+				if (muse != null) {
+					state = muse.state;
+					eventBlock = state.getBlock();
+					pos = muse.pos;
+				}
+			}
+			BlockBranch branch = (BlockBranch) state.getBlock();
+			NodeNetVolume volumeSum = new NodeNetVolume();
+			branch.analyse(state, world, pos, (EnumFacing) null, new MapSignal(new INodeInspector[]{volumeSum}));
+
+			return volume = (int) (volumeSum.getVolume() * ModConfigs.treeHarvestMultiplier);
+		} else return 0;
+	}
+
+	@SubscribeEvent
+	public void DTVolCheck(BreakEvent event)
+	{
+		Set<QuestData> quests = PlayerCivilizationCapabilityImpl.get(event.getPlayer()).getCurrentQuests();
+
+		for ( QuestData data : quests )
+		{
+			try
+			{
+				if ( data.getiData().containsKey("block_type") )
+				{
+					int bt = data.getiData().get("block_type");
+					int vol = getDTVolume(event);
+					QuestMine.INSTANCE.perform(data, vol);
+				}
+			}
+			catch (Exception e)
+			{
+
+			}
+		}
+	}
 	
 	@SubscribeEvent
 	public void harvestDrops(HarvestDropsEvent event)
