@@ -6,14 +6,12 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockSandStone;
-import net.minecraft.block.BlockStone;
-import net.minecraft.block.BlockStoneBrick;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
@@ -73,7 +71,11 @@ public class QuestBuild extends QuestBase implements Quest
 //			}
 //		}
 		
-		if ( event.getPlacedBlock().getMaterial() == Material.ROCK || event.getPlacedBlock() instanceof BlockStone || event.getPlacedBlock() instanceof BlockStoneBrick || event.getPlacedBlock() instanceof BlockSandStone ) // || event.getPlacedBlock() instanceof BlockStone )
+		if ( event.getPlacedBlock().getMaterial() == Material.ROCK
+				|| event.getPlacedBlock() instanceof BlockStone
+				|| event.getPlacedBlock() instanceof BlockWall
+				|| event.getPlacedBlock() instanceof BlockStoneBrick
+				|| event.getPlacedBlock() instanceof BlockSandStone ) // || event.getPlacedBlock() instanceof BlockStone )
 		{
 			Set<QuestData> quests = PlayerCivilizationCapabilityImpl.get(event.getPlayer()).getCurrentQuests();
 			
@@ -153,8 +155,8 @@ public class QuestBuild extends QuestBase implements Quest
 		q.data.setQuestType(ID);
 		q.data.setCompleted(false);
 
-		int roll = rand.nextInt(3)*64+128;
-		int em = (int)Math.round((double)roll/32)+6;
+		int roll = rand.nextInt(3)*4+8;
+		int em = (int)Math.round((double)roll/16+2);
 		q.setRewardRep(em*2);
 		if ( PlayerCivilizationCapabilityImpl.get(player).getReputation(province.civilization) >= 2000 )
 		{
