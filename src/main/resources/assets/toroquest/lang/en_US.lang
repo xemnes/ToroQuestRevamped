@@ -34,6 +34,9 @@ item.trophy_beholder.name=§6Eye of the Obsidian Horror§r
 item.dwarven_artifact.name=§6Dwarven Alternator§r
 item.royal_helmet.name=§eRoyal Crown§r
 
+item.royal_leggings.name=Royal Leggings
+item.royal_chestplate.name=Royal Chestplate
+item.royal_boots.name=Royal Boots
 item.samurai_boots.name=Samurai Skirt
 item.samurai_helmet.name=Samurai Helmet
 item.samurai_leggings.name=Samurai Leggings
@@ -270,7 +273,7 @@ quests.build.complete=Those walls look magnificent! Well done.
 quests.build.incomplete=You haven't built enough of the wall, @p.
 
 quests.build.reject=3
-quests.build.reject0=How hard is it for you to place just a §olittle§r cobblestone around the village?! Unbelievable! I bet you have chests full of that $#!* just laying around.
+quests.build.reject0=How hard is it for you to place just a §olittle§r stone around the village?! Unbelievable!
 quests.build.reject1=Excuse me? You expect the §obandits§r to pay for the wall?
 quests.build.reject2=The village needs walls to protect itself against bandits and monsters. Will you reconsider?
 
