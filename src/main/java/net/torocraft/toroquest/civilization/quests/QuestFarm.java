@@ -194,7 +194,7 @@ public class QuestFarm extends QuestBase implements Quest
 		q.data.setQuestType(ID);
 		q.data.setCompleted(false);
 
-		int roll = rand.nextInt(5)*16+32;
+		int roll = rand.nextInt(5)*4+8;
 		int em = (int)Math.round((double)roll/16)+2;
 
 		q.setRewardRep(em*2);
