@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
 import net.minecraft.block.BlockGrass;
@@ -26,6 +24,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.server.command.TextComponentHelper;
 import net.torocraft.toroquest.civilization.CivilizationHandlers;
+import net.torocraft.toroquest.civilization.CivilizationType;
 import net.torocraft.toroquest.civilization.Province;
 import net.torocraft.toroquest.civilization.player.PlayerCivilizationCapabilityImpl;
 import net.torocraft.toroquest.civilization.quests.util.Quest;
@@ -235,33 +234,30 @@ public class QuestMine extends QuestBase implements Quest
 //	    	return;
 //	}
 
-	public boolean perform(QuestData quest, int count)
+	public void perform(QuestData quest, int count)
 	{
-
-		if (quest.getPlayer().world.isRemote)
+		if ( !quest.getCompleted() )
 		{
-			return false;
+			if (quest.getPlayer().world.isRemote)
+			{
+				return;
+			}
+			
+			if ( !(quest.getQuestType() == ID) )
+			{
+				return;
+			}
+			
+			quest.getiData().put("amount", quest.getiData().get("amount")+count);
+	
+			quest.getPlayer().sendStatusMessage( new TextComponentString(MathHelper.clamp(quest.getiData().get("amount"), 0, quest.getiData().get("target"))+"/"+quest.getiData().get("target")), true);
+	
+			if ( quest.getiData().get("amount") >= quest.getiData().get("target") )
+			{
+				quest.setCompleted(true);
+				chatCompletedQuest(quest);
+			}
 		}
-		
-		if ( !(quest.getQuestType() == ID) )
-		{
-			return false;
-		}
-		
-		quest.getiData().put("amount", quest.getiData().get("amount")+count);
-
-		quest.getPlayer().sendStatusMessage( new TextComponentString(MathHelper.clamp(quest.getiData().get("amount"), 0, quest.getiData().get("target"))+"/"+quest.getiData().get("target")), true);
-//
-//		if ( !quest.data.getCompleted() && quest.getCurrentAmount() >= quest.getTargetAmount() )
-//		{
-//			if ( !quest.data.getPlayer().world.isRemote )
-//			{
-//				quest.data.getPlayer().sendStatusMessage( new TextComponentString( I18n.format("quest.quest_complete_message") ), ToroQuestConfiguration.showQuestCompletionAboveActionBar );
-//			}
-//			quest.data.getPlayer().world.playSound((EntityPlayer)null, quest.data.getPlayer().posX, quest.data.getPlayer().posY, quest.data.getPlayer().posZ, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 1.1F, 1.1F);
-//		}
-
-		return true;
 	}
 
 
@@ -769,7 +765,7 @@ public class QuestMine extends QuestBase implements Quest
 	{
 //			DataWrapper q = new DataWrapper().setData(data);
 			
-//			Province province = getQuestProvince(q.data);
+//			Province province = getQuestProvince(q.getData());
 			
 //			if ( type == null || province == null )
 //			{
@@ -820,7 +816,7 @@ public class QuestMine extends QuestBase implements Quest
 	
 //			tool.setStackDisplayName(tool.getDisplayName() + " of " + province.name.toString() );
 //			tool.addEnchantment(Enchantment.getEnchantmentByLocation("minecraft:unbreaking"), 1);
-//			tool.setTagInfo("mine_quest", new NBTTagString(q.data.getQuestId().toString()));
+//			tool.setTagInfo("mine_quest", new NBTTagString(q.getData().getQuestId().toString()));
 //			tool.setTagInfo("provinceID", new NBTTagString(province.id.toString()));
 //			tool.setTagInfo("provinceName", new NBTTagString(province.name.toString()));
 	
@@ -979,15 +975,15 @@ public class QuestMine extends QuestBase implements Quest
 		s.append("|").append(q.getTargetAmount());
 		s.append("|").append( "§l" + resource + "§r" );
 		s.append("|").append( "\n\n" );
-		s.append("|").append( listItems(getRewardItems(q.data)) + ",\n" );
-		s.append("|").append(getRewardRep(q.data));
+		s.append("|").append( listItems(getRewardItems(q.getData())) + ",\n" );
+		s.append("|").append(getRewardRep(q.getData()));
 		return s.toString();
 	}
 	
 	// ========================================================================================
 	// ========================================================================================
 
-	 public static final List<ItemStack> cobbleStone = OreDictionary.getOres("cobblestone");
+	// public static final List<ItemStack> blockStone = OreDictionary.getOres("stone");
 	
 	// public static final List<ItemStack> blockStone = OreDictionary.getOres("stone");
 
@@ -1005,10 +1001,6 @@ public class QuestMine extends QuestBase implements Quest
 				Block b = Block.getBlockFromItem(item);
 				
 				if ( b instanceof BlockLog )
-				{
-					return true;
-				}
-				else if ( b instanceof BlockBranch || b instanceof BlockTrunkShell)
 				{
 					return true;
 				}
@@ -1032,35 +1024,35 @@ public class QuestMine extends QuestBase implements Quest
 			{
 				Block b = Block.getBlockFromItem(item);
 
-
-					if ( b.getUnlocalizedName().equals("tile.stonebrick") )
-					{
-						return true;
-					}
-
-					if ( b.getUnlocalizedName().equals("tile.cobblestone") )
-					{
-						return true;
-					}
-
-					if ( b.getUnlocalizedName().equals("tile.stone") )
-					{
-						return true;
-					}
-
-					for ( ItemStack block : cobbleStone )
-					{
-						if ( b.getDefaultState().getMaterial() == Material.ROCK && b.getDefaultState().isFullCube() )
-						{
-							if ( block.getItem().getUnlocalizedName().equals(b.getUnlocalizedName()) )
-							{
-								return false;
-							}
-							else return true;
-						}
-					}
-
-
+//				if ( ToroQuestConfiguration.useOreDicForMineQuest )
+//				{
+//					if ( b.getUnlocalizedName().equals("tile.stonebrick") )
+//					{
+//						return true;
+//					}
+//					
+//					if ( b.getUnlocalizedName().equals("tile.cobblestone") )
+//					{
+//						return true;
+//					}
+//					
+//					if ( b.getUnlocalizedName().equals("tile.stone") )
+//					{
+//						return true;
+//					}xx
+//					
+////					for ( ItemStack block : blockStone )
+////					{
+////						if ( block.getItem().getUnlocalizedName().equals(b.getUnlocalizedName()) )
+////						{
+////							return true;
+////						}
+////					}
+//				}
+				if ( b.getDefaultState().getMaterial() == Material.ROCK && b.getDefaultState().isFullCube() )
+				{
+					return true;
+				}
 				
 				return false;
 			}
@@ -1070,10 +1062,10 @@ public class QuestMine extends QuestBase implements Quest
 			}
 			case 4: // REDSTONE
 			{
-				if ( player.posY > 60 )
-				{
-					return false;
-				}
+//				if ( player.posY > 60 )
+//				{
+//					return false;
+//				}
 				return item == Items.REDSTONE;
 			}
 			case 5: // OBSIDIAN
@@ -1099,10 +1091,10 @@ public class QuestMine extends QuestBase implements Quest
 			}
 			case 8: // DIAMOND
 			{
-				if ( player.posY > 60 )
-				{
-					return false;
-				}
+//				if ( player.posY > 60 )
+//				{
+//					return false;
+//				}
 				return item == Items.DIAMOND;
 			}
 		}
@@ -1119,12 +1111,12 @@ public class QuestMine extends QuestBase implements Quest
 		
 		DataWrapper q = new DataWrapper();
 
-		q.data.setCiv(questProvince.civilization);
-		q.data.setPlayer(player);
-		q.data.setProvinceId(questProvince.id);
-		q.data.setQuestId(UUID.randomUUID());
-		q.data.setQuestType(ID);
-		q.data.setCompleted(false);
+		q.getData().setCiv(questProvince.civilization);
+		q.getData().setPlayer(player);
+		q.getData().setProvinceId(questProvince.id);
+		q.getData().setQuestId(UUID.randomUUID());
+		q.getData().setQuestType(ID);
+		q.getData().setCompleted(false);
 		
 //		Blocks.DIRT,
 //		Blocks.STONE,
@@ -1150,7 +1142,11 @@ public class QuestMine extends QuestBase implements Quest
 			blockType = rand.nextInt(5);
 		}
 		
-		if ( ToroQuestConfiguration.disableTreeChoppingQuest && blockType == 0 )
+		if ( questProvince.civilization == CivilizationType.SUN )
+		{
+			if ( blockType < 2 ) blockType = rand.nextInt(2)+2;
+		}
+		else if ( blockType == 0 && ( ToroQuestConfiguration.disableTreeChoppingQuest ) )
 		{
 			blockType = rand.nextInt(3)+1;
 		}
@@ -1164,56 +1160,56 @@ public class QuestMine extends QuestBase implements Quest
 		{
 			case 0: // LOG
 			{
-				roll = (rand.nextInt(5)+2)*16;
-				em = (int)Math.round(roll/8)+3;
+				roll = (rand.nextInt(2)+2)*64;
+				em = (int)Math.round(roll/8);
 				break;
 			}
 			case 1: // DIRT
 			{
-				roll = (rand.nextInt(4)+3)*4;
-				em = (int)Math.round(roll/16)+2;
+				roll = (rand.nextInt(3)+2)*64;
+				em = (int)Math.round(roll/16);
 				break;
 			}
 			case 2: // STONE
 			{
-				roll = (rand.nextInt(4)+3)*16;
-				em = (int)Math.round(roll/16)+2;
+				roll = (rand.nextInt(3)+2)*64;
+				em = (int)Math.round(roll/16);
 				break;
 			}
 			case 3: // COAL
 			{
-				roll = (rand.nextInt(3)+2)*4;
-				em = (int)Math.round(roll/4)+3;
+				roll = (rand.nextInt(3)+2)*8;
+				em = (int)Math.round(roll/3)+4;
 				break;
 			}
 			case 4: // REDSTONE
 			{
-				roll = (rand.nextInt(3)+2)*4;
-				em = (int)Math.round(roll/4)+3;
+				roll = (rand.nextInt(4)+3)*8;
+				em = (int)Math.round(roll/3)+8;
 				break;
 			}
 			case 5: // OBSIDIAN
 			{
-				roll = (rand.nextInt(4)+2)*4;
-				em = (int)Math.round(roll/2)+3;
+				roll = (rand.nextInt(4)+2)*8;
+				em = (int)Math.round(roll)+2;
 				break;
 			}
 			case 6: // GLOWSTONE
 			{
 				roll = (rand.nextInt(5)+4)*8;
-				em = (int)Math.round(roll/4)+6;
+				em = (int)Math.round(roll/4)+8;
 				break;
 			}
 			case 7: // LAPIS
 			{
-				roll = (rand.nextInt(5)+4)*2;
-				em = (int)Math.round(roll/2)+8;
+				roll = (rand.nextInt(5)+6)*2;
+				em = (int)Math.round(roll)+12;
 				break;
 			}
 			case 8: // DIAMOND
 			{
-				roll = 2;
-				em = 30;
+				roll = 1;
+				em = 24;
 				break;
 			}
 		}
@@ -1229,9 +1225,9 @@ public class QuestMine extends QuestBase implements Quest
 		List<ItemStack> rewards = new ArrayList<ItemStack>(1);
 		ItemStack emeralds = new ItemStack(Items.EMERALD, em);
 		rewards.add(emeralds);
-		setRewardItems(q.data, rewards);
-		this.setData(q.data);
-		return q.data;
+		setRewardItems(q.getData(), rewards);
+		this.setData(q.getData());
+		return q.getData();
 	}
 	
 	
