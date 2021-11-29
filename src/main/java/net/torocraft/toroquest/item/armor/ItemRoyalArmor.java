@@ -218,7 +218,7 @@ public class ItemRoyalArmor extends ItemArmor {
 							if ( CivilizationUtil.getProvinceAt(worldIn, playerIn.chunkCoordX, playerIn.chunkCoordZ) == null )
 							{
 					            EntityVillageLord vl = new EntityVillageLord(guard.getEntityWorld());
-								CivilizationsWorldSaveData.get(worldIn).registerCrown(playerIn.chunkCoordX, playerIn.chunkCoordZ);
+								CivilizationsWorldSaveData.get(worldIn).register(playerIn.chunkCoordX, playerIn.chunkCoordZ, false);
 								provinceOn = CivilizationUtil.getProvinceAt(worldIn, guard.chunkCoordX, guard.chunkCoordZ);
 								if ( provinceOn != null )
 								{
